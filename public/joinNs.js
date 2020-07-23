@@ -38,8 +38,9 @@ function joinNs(endpoint) {
     joinRoom(topRoomName);
   });
 
+  // server sending message to clients
   nsSocket.on("messageToClients", (msg) => {
-    console.log(msg);
+    // console.log(msg);
     const newMsg = buildHTML(msg);
     document.getElementById("messages").innerHTML += newMsg;
   }); // if message comes from server
@@ -49,22 +50,52 @@ function joinNs(endpoint) {
     .addEventListener("submit", formSubmission); // listener for form, so if user sends a message will go to server
 }
 
+// f
+
 function formSubmission(event) {
   event.preventDefault();
-  const newMessage = document.getElementById("user-message").value;
+  const formData = Object.fromEntries(new FormData(event.target));
+  const newMessage = formData.text;
+  const newFile = formData.file;
+  // console.log(newFile);
+  let filePassed = false;
+
+  if (newFile.size !== 0) {
+    filePassed = true;
+
+    var reader = new FileReader();
+    reader.onload = function (event) {
+      const filemsg = {};
+      filemsg.file = event.target.result;
+      filemsg.fileName = newFile.name;
+      filemsg.test = "Hello";
+      console.log(filemsg.fileName);
+      nsSocket.emit("newMessageToServer", { file: filemsg });
+    };
+    reader.readAsDataURL(newFile);
+  }
+  // if (newMessage.length > 0 && filePassed === true) {
+  //   nsSocket.emit("newMessageToServer", { text: newMessage, file: newFile });
+  // } else if (newMessage.length > 0) {
+  //   nsSocket.emit("newMessageToServer", { text: newMessage });
+  // } else if (filePassed === true) {
+  //   nsSocket.emit("newMessageToServer", { file: newFile });
+  // }
   nsSocket.emit("newMessageToServer", { text: newMessage });
+  console.log("filepassed: " + filePassed);
+  event.target.reset();
 }
 
 function buildHTML(msg) {
   const convertedDate = new Date(msg.time).toLocaleString();
-  const newHTML = `
-    <li>
+  const newHTML = `<li>
             <div class="user-image">
               <img src="${msg.avatar}" />
             </div>
             <div class="user-message">
               <div class="user-name-time">${msg.username} <span>${convertedDate}</span></div>
               <div class="message-text">${msg.text}</div>
+              <img src=${msg.file} alt="" />
             </div>
           </li>`;
 

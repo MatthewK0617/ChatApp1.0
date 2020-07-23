@@ -44,13 +44,21 @@ namespaces.forEach((namespace) => {
       nsSocket.emit("historyCatchUp", nsRoom.history);
       updateUsersInRoom(namespace, roomToJoin);
     });
+
+    // when the server recieves "newMessageToServer" (server)
     nsSocket.on("newMessageToServer", (msg) => {
       const fullMsg = {
         text: msg.text,
         time: Date.now(),
         username: username,
+        file: msg.file,
+        // filetest: filemsg.test,
+        // fileName: sentFile,
         avatar: "https://via.placeholder.com/30",
       };
+      console.log(fullMsg);
+
+      // --------------------------------------------
 
       const roomTitle = Object.keys(nsSocket.rooms)[1];
       const nsRoom = namespace.rooms.find((room) => {
