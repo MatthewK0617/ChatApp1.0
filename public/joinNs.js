@@ -1,3 +1,5 @@
+const { default: Axios } = require("axios");
+
 function joinNs(endpoint) {
   if (nsSocket) {
     // check to see if this actually is a socket
@@ -50,30 +52,28 @@ function joinNs(endpoint) {
     .addEventListener("submit", formSubmission); // listener for form, so if user sends a message will go to server
 }
 
-// f
+const axios = require("axios");
+
+axios
+  .post("/user", {
+    firstName: "Fred",
+    lastName: "Flintstone",
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
 
 function formSubmission(event) {
   event.preventDefault();
   const formData = Object.fromEntries(new FormData(event.target));
   const newMessage = formData.text;
   const newFile = formData.file;
-  // console.log(newFile);
+
   let filePassed = false;
 
-  if (newFile.size !== 0) {
-    filePassed = true;
-
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      const filemsg = {};
-      filemsg.file = event.target.result;
-      filemsg.fileName = newFile.name;
-      filemsg.test = "Hello";
-      console.log(filemsg.fileName);
-      nsSocket.emit("newMessageToServer", { file: filemsg });
-    };
-    reader.readAsDataURL(newFile);
-  }
   // if (newMessage.length > 0 && filePassed === true) {
   //   nsSocket.emit("newMessageToServer", { text: newMessage, file: newFile });
   // } else if (newMessage.length > 0) {
@@ -82,7 +82,7 @@ function formSubmission(event) {
   //   nsSocket.emit("newMessageToServer", { file: newFile });
   // }
   nsSocket.emit("newMessageToServer", { text: newMessage });
-  console.log("filepassed: " + filePassed);
+  // console.log("filepassed: " + filePassed);
   event.target.reset();
 }
 
